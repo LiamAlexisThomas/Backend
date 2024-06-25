@@ -41,7 +41,7 @@ Content-Type: application/json
 
 {
     "dni": "2022",
-    "idMateria": "1"
+    "id_m": "1"
 }
 
 ###
@@ -49,5 +49,5 @@ GET {{materiabyid}}
 Content-Type: application/json
 
 {
-    "id_m": "1",
+    "id": "10",
 }

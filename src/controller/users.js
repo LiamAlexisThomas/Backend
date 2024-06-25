@@ -82,9 +82,9 @@ export const auth = (req, res, next) => {
 export const getMateriaByID = (req, res) => {
   const user = req.user;
   const listaMaterias = [
-    { id: 10, nombre: "so" },
-    { id: 11, nombre: "arquitectura" },
-    { id: 12, nombre: "web" },
+    { nombre: "so" },
+    { nombre: "arquitectura" },
+    { nombre: "web" },
   ];
   return res.json(listaMaterias);
 };

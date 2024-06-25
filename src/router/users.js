@@ -37,7 +37,7 @@ routerUsers.post("/user/cursar", cursar);
 routerUsers.post("/user/addMateria", addMateria);
 
 //nueva ruta, para lista productos
-routerUsers.get("/user/getMateriaByid", auth, getMateriaByID);
+routerUsers.get("/user/getMateriaByid", getMateriaByID);
 
 
 export default routerUsers;
