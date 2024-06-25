@@ -1,6 +1,11 @@
 @login = http://localhost:3000/user/login
 @singup = http://localhost:3000/user/usersp
-@materias = http://localhost:3000/user/token
+
+@addmaterias = http://localhost:3000/user/addMateria
+
+@cursarmaterias = http://localhost:3000/user/cursar
+
+@materiabyid = http://localhost:3000/user/getMateriaByid
 
 
 
@@ -8,17 +13,8 @@ POST {{login}}
 Content-Type: application/json
 
 {
-   "dni" : "2021",
+   "dni" : "2023",
    "password": "1234"
-}
-
-###
-POST {{token}}
-Content-Type: application/json
-
-{
-    "dni" : "2021",
-    "nombre": "1234"
 }
 
 ###
@@ -26,10 +22,32 @@ POST {{singup}}
 Content-Type: application/json
 
 {
-   "dni" : "2021",
+   "dni" : "2022",
    "nombre" : "prueba 1",
    "password" : "1234"
 }
 
+###
+POST {{addmaterias}}
+Content-Type: application/json
 
+{
+    "nombre_materia": "Matematicas"
+}
 
+###
+POST {{cursarmaterias}}
+Content-Type: application/json
+
+{
+    "dni": "2022",
+    "idMateria": "1"
+}
+
+###
+GET {{materiabyid}}
+Content-Type: application/json
+
+{
+    "id_m": "1",
+}

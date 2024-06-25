@@ -1,20 +1,16 @@
 import { connect } from "../databases"; //objeto conexion
 import jwt from "jsonwebtoken";
-const claveSecreta = process.env.DATA_SECRET_KEY; //obtengo la clave secreta del documento .env
+const claveSecreta = process.env.DATA_SECRET_KEY; 
 
-//tarea: modificar la bd, la tabla alumnos, agregar el campo pass o constraseña, ademas agregar un resgistro de prueba
 export const logIn = async (req, res) => {
   try {
     //intenta hacer lo que ...
     //obtener los datos del front
     const { dni, password } = req.body;
-
     //conectar me con labse de datos, guardo la conexion en cnn
     const cnn = await connect();
-
     //obtenemos el usuario con el dni
     const [rows] = await cnn.query("SELECT * FROM alumno WHERE dni=?", [dni]);
-
     //comprobamos que el user existe
     if (rows.length > 0) {
       if (rows[0].pass === password) {
@@ -22,26 +18,23 @@ export const logIn = async (req, res) => {
         //objeto payload
         const payload = { dni: dni, nombre: rows[0].nombre };
         const token = getToken(payload);
-        return res
-          .status(200)
-          .header("auth", token)
-          .json({ message: "todo ok" });
+        return res.status(200).header("auth", token).json({ message: "todo ok" });
       } else {
         return res.status(400).json({ succes: false });
       }
     } else {
-      return res.status(500).json({ succes: false }); //el usuario no existe
+      return res.status(500).json({ message: "El usuario no existe" }); //el usuario no existe
     }
   } catch (error) {
     console.log("error desde login", error.message);
     //devolver al cliente la respuesta con status, ademas lo voy a acompalar con un json
     return res
       .status(500)
-      .json({ succes: false, message: "no se ejecuto el try", error: error }); //utilizo el metodo .json({objeto}) para transformar el objeto en json
+      .json({ succes: false, message: "no se ejecuto el try", error: error.message }); //utilizo el metodo .json({objeto}) para transformar el objeto en json
   }
 };
 
-//crear usuarios desde el sigup
+//crear usuarios desde el singup
 export const createUsers = async (req, res) => {
   try {
     const { dni, nombre, password } = req.body;
@@ -50,20 +43,14 @@ export const createUsers = async (req, res) => {
 
     const q = "INSERT INTO alumno ( dni, nombre, pass ) VALUES (?, ? ,?)";
     const valores = [dni, nombre, password];
-
-    //comprobar si el alumno existe, si existe retorn el mensaje al front
-
     const exist = await isExist(dni, "alumno", "dni", cnn);
 
-    if (exist) return res.status(400).json({ message: "usuario ya existe" });
+    if (exist) return res.status(400).json({ message: "El usuario ya existe" });
 
     const [result] = await cnn.query(q, valores);
 
     if (result.affectedRows === 1) {
-      //se creo la cuenta
-      //iniciar session directamente --> crear el token y enviarlo
-      //enviar un email -->
-      return res.status(200).json({ success: true, resultado: result });
+      return res.status(200).json({ success: true });
     } else {
       return res.status(400).json({ success: false });
     }
@@ -76,16 +63,10 @@ export const createUsers = async (req, res) => {
 export const auth = (req, res, next) => {
   //obtengo el token desde la request/ front
   const token = req.headers["auth"];
-  if (!token) return res.status(400).json({ message: "no hay token" }); //si no hay token
+  if (!token) return res.status(400).json({ message: "No hay token" }); //si no hay token
 
   //verificar si el token es valido
-  jwt.verify(
-    token,
-    claveSecreta,
-    (
-      error,
-      payload //error va a captura si el token es invalido
-    ) => {
+  jwt.verify(token, claveSecreta, (error, payload) => {
       if (error) {
         //si el token es invalido
         return res.status(400).json({ message: "el token no es valido" });
@@ -98,20 +79,50 @@ export const auth = (req, res, next) => {
   );
 };
 
-export const ListarMateriasByDni = (req, res) => {
+export const getMateriaByID = (req, res) => {
   const user = req.user;
-  const { dni, nombre } = user;
-  console.log(dni);
-  //consultar en la base de datos los productos guardados para el user
-  //estamos simulando una lista de la base de datos
   const listaMaterias = [
     { id: 10, nombre: "so" },
     { id: 11, nombre: "arquitectura" },
     { id: 12, nombre: "web" },
   ];
-
   return res.json(listaMaterias);
 };
+
+export const addMateria = async (req, res) => {
+  try {
+    const {nombre_materia} = req.body;
+    const cnn = await connect();
+    const q = "INSERT INTO materia (nombre_materia) VALUES (?)";
+    const valores = [nombre_materia];
+    const [result] = await cnn.query(q, valores);
+    if (result.affectedRows === 1) {
+      return res.status(200).json({ success: true });
+    } else {
+      return res.status(400).json({ success: false });
+    }
+  } catch (error) {
+    return res.status(400).json({success: false, error: error})
+  }
+}
+
+export const cursar = async (req, res) => {
+  try {
+    const {dni, id_m} = req.body;
+    const cnn = await connect();
+    const q = "INSERT INTO cursar (dni, id_m) VALUES(?,?)";
+    const valores = [dni, id_m]
+    const [rows] = await cnn.query(q, valores);
+    if (rows.affectedRows === 1) {
+      return res.status(200).json({ success: true });
+    } else {
+      return res.status(400).json({ success: false });
+    }
+  } catch (error) {
+    return res.status(400).json({success: false, error: error})
+  }
+}
+
 
 //funciones privadas
 //comprobar que existe el usuario

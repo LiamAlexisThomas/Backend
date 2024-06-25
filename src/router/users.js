@@ -2,7 +2,9 @@
 
 import { Router } from "express";
 import {
-  ListarMateriasByDni,
+  getMateriaByID,
+  addMateria,
+  cursar,
   auth,
   createUsers,
   logIn,
@@ -30,7 +32,12 @@ routerUsers.post("/user/usersp", createUsers);
 
 //cada vez que agrego una nueva funcion debo crear una nueva ruta
 
+routerUsers.post("/user/cursar", cursar);
+
+routerUsers.post("/user/addMateria", addMateria);
+
 //nueva ruta, para lista productos
-routerUsers.get("/user/listarMaterias", auth, ListarMateriasByDni);
+routerUsers.get("/user/getMateriaByid", auth, getMateriaByID);
+
 
 export default routerUsers;
